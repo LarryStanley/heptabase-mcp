@@ -4,116 +4,133 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Model Context Protocol (MCP) service for interacting with Heptabase backup data. The service enables AI assistants to search, retrieve, analyze, and export Heptabase whiteboards and cards.
+This is a Model Context Protocol (MCP) service for interacting with Heptabase backup data. The service enables AI assistants like Claude to search, retrieve, analyze, and export Heptabase whiteboards and cards through a standardized MCP interface.
 
-## Development Commands
-
-Since this project is not yet implemented, these commands are planned based on the specification:
+## Commands
 
 ```bash
 # Install dependencies
 npm install
 
 # Development
-npm run dev         # Run in development mode with hot reload
-npm start          # Run the MCP server
+npm run dev         # Run with ts-node for development
+npm start          # Run compiled JavaScript
 
 # Testing
 npm test           # Run all tests
 npm test:watch     # Run tests in watch mode
+npm test:coverage  # Run tests with coverage
+npm test:integration # Run integration tests
 
-# Building
-npm run build      # Build TypeScript to JavaScript
-npm run type-check # Check TypeScript types
+# Building and Linting
+npm run build      # Compile TypeScript to JavaScript
+npm run type-check # Type check without emitting
+npm run lint       # Type check with tsc --noEmit
 
-# Linting
-npm run lint       # Run ESLint
-npm run lint:fix   # Fix auto-fixable lint issues
+# Publishing
+npm run prepublishOnly # Build and test before publish
 ```
 
 ## Architecture
 
 The project follows a layered architecture:
 
-1. **MCP Server Layer** (`src/index.ts`)
-   - Implements MCP protocol
-   - Handles tool registration and execution
-   - Manages resources and settings
+1. **Entry Point** (`src/index.ts`)
+   - Sets up environment variables
+   - Initializes and starts the MCP server
+   - Handles process signals
 
-2. **Service Layer** (`src/services/`)
-   - `BackupManager`: Handles backup file operations, zip extraction, file watching
-   - `HeptabaseDataService`: Parses JSON data, provides query interface, manages cache
-   - Core business logic for working with Heptabase data
+2. **MCP Server** (`src/server.ts`)
+   - Core MCP server implementation
+   - Registers tools with the MCP protocol
+   - Manages tool execution and error handling
 
-3. **Tools Layer** (`src/tools/`)
-   - Individual MCP tool implementations
-   - Categories: backup management, search, data retrieval, export, analysis
+3. **Service Layer** (`src/services/`)
+   - `BackupManager`: Manages backup files, ZIP extraction, file watching
+   - `HeptabaseDataService`: Handles JSON parsing, data queries, caching
 
-4. **Type Definitions** (`src/types/`)
-   - TypeScript interfaces for Heptabase data structures
-   - MCP protocol types
+4. **Tools** (`src/tools/`)
+   - MCP tool implementations organized by function:
+     - Backup management
+     - Search operations
+     - Data retrieval
+     - Export functionality
+     - Analysis tools
 
-## Key Implementation Notes
+5. **Types** (`src/types/`)
+   - TypeScript interfaces for Heptabase data models
+   - MCP protocol type definitions
 
-### Backup File Handling
-- Support both .zip archives and extracted JSON files
-- Automatic extraction of zip files when configured
-- File watching capability for auto-loading new backups
-- Implement in `src/services/BackupManager.ts`
+## Testing
 
-### Data Models
-- `Whiteboard`: Contains metadata and structure
-- `Card`: Core content unit with rich text
-- `CardInstance`: Position and appearance on whiteboards
-- `Connection`: Relationships between cards
-- Define in `src/types/heptabase.ts`
+The project uses Jest for testing:
 
-### Performance Considerations
-- Implement lazy loading for large backup files
-- Use incremental JSON parsing for memory efficiency
-- Add caching layer in `HeptabaseDataService`
-- Background processing for zip extraction
+- **Unit tests**: Located in `tests/unit/`
+- **Integration tests**: Located in `tests/integration/`
+- **Test fixtures**: Located in `tests/fixtures/`
 
-### MCP Tools Implementation
-Tools should be organized by category:
-- `src/tools/backup/`: configureBackupPath, listBackups, loadBackup
-- `src/tools/search/`: searchWhiteboards, searchCards
-- `src/tools/retrieval/`: getWhiteboard, getCard, getCardsByArea
-- `src/tools/export/`: exportWhiteboard, summarizeWhiteboard
-- `src/tools/analysis/`: analyzeGraph, compareBackups
+Test configurations:
+- `jest.config.js`: Main test configuration
+- `jest.integration.config.js`: Integration test configuration
+- `jest.setup.ts`: Test setup and mocks
 
-### Settings Management
-- Use `.mcp-settings.json` for configuration
-- Default settings should be defined in `src/config/defaults.ts`
-- Support environment variable overrides
+## Environment Configuration
 
-## Dependencies
+The service uses environment variables for configuration:
 
-Key dependencies to include in `package.json`:
-- `@anthropic/mcp`: MCP protocol implementation
-- `unzipper`: For extracting backup archives
-- `fs-extra`: Enhanced file system operations
-- `chokidar`: File watching capabilities
-- `lodash`: Utility functions
-- TypeScript and development tools
-
-## Testing Strategy
-
-1. Unit tests for data parsing and transformations
-2. Integration tests for MCP tools
-3. Mock Heptabase backup data for testing
-4. Test file watching and extraction features
-
-## Configuration File
-
-Create `.mcp-settings.json` in the project root:
-```json
-{
-  "backupPath": "/path/to/heptabase/backups",
-  "autoExtract": true,
-  "watchDirectory": true,
-  "extractionPath": "./data/extracted",
-  "keepExtracted": true,
-  "cacheEnabled": true
-}
+```env
+HEPTABASE_BACKUP_PATH=/path/to/heptabase/backups
+HEPTABASE_AUTO_EXTRACT=true
+HEPTABASE_WATCH_DIRECTORY=true
+HEPTABASE_EXTRACTION_PATH=./data/extracted
+HEPTABASE_KEEP_EXTRACTED=true
+HEPTABASE_MAX_BACKUPS=10
+HEPTABASE_CACHE_ENABLED=true
 ```
+
+## Development Workflow
+
+1. **Adding new tools**:
+   - Define the tool interface in the appropriate category under `src/tools/`
+   - Register the tool in `src/server.ts`
+   - Add tests in `tests/unit/tools/`
+
+2. **Updating data models**:
+   - Modify interfaces in `src/types/heptabase.ts`
+   - Update corresponding services and tools
+   - Add or update tests
+
+3. **Running tests**:
+   - Run `npm test` before committing
+   - Use `npm test:watch` during development
+   - Check coverage with `npm test:coverage`
+
+4. **Type checking**:
+   - Run `npm run type-check` to check types without building
+   - Run `npm run build` to compile and check for errors
+
+## Key Dependencies
+
+- `@modelcontextprotocol/sdk`: MCP protocol implementation
+- `unzipper`: ZIP file extraction
+- `fs-extra`: Enhanced file system operations
+- `chokidar`: File watching
+- `lodash`: Utility functions
+- `zod`: Schema validation
+- `dotenv`: Environment variable loading
+
+## Error Handling
+
+The project uses standardized error handling:
+- All errors are caught and properly formatted for MCP protocol
+- Tool errors include descriptive messages for debugging
+- File operations use fs-extra for better error messages
+- Validation uses Zod for parameter checking
+
+## Performance Considerations
+
+1. **Lazy loading**: Backup files are loaded on demand
+2. **Caching**: Frequently accessed data is cached in memory
+3. **Streaming**: Large files are processed using streams
+4. **Background extraction**: ZIP files are extracted asynchronously
+5. **File watching**: Only watches when configured to reduce overhead
