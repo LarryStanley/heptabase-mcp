@@ -2,6 +2,10 @@
 
 A Model Context Protocol (MCP) service for interacting with Heptabase backup data. This service allows AI assistants like Claude to search, retrieve, analyze, and export Heptabase whiteboards and cards.
 
+<a href="https://glama.ai/mcp/servers/@LarryStanley/heptabse-mcp">
+  <img width="380" height="200" src="https://glama.ai/mcp/servers/@LarryStanley/heptabse-mcp/badge" alt="Heptabase MCP server" />
+</a>
+
 ## Features
 
 - 🔍 Search whiteboards and cards
