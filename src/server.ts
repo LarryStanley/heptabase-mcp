@@ -414,37 +414,48 @@ export class HeptabaseMcpServer {
     this.tools.getWhiteboard = {
       inputSchema: getWhiteboardSchema,
       handler: async (params) => {
-        await this.ensureDataServiceInitialized();
+        try {
+          await this.ensureDataServiceInitialized();
 
-        const options = {
-          includeCards: params.includeCards || false,
-          includeConnections: params.includeConnections || false,
-          depth: params.depth
-        };
+          const options = {
+            includeCards: params.includeCards || false,
+            includeConnections: params.includeConnections || false,
+            depth: params.depth
+          };
 
-        const result = await this.dataService!.getWhiteboard(params.whiteboardId, options);
-        
-        let text = `Whiteboard: ${result.whiteboard.name} (ID: ${result.whiteboard.id})\n`;
-        text += `Created: ${result.whiteboard.createdTime}\n`;
-        text += `Last edited: ${result.whiteboard.lastEditedTime}\n`;
-        
-        if (result.cards) {
-          text += `\nCards: ${result.cards.length}\n`;
-          result.cards.forEach(card => {
-            text += `- ${card.title || 'Untitled'} (ID: ${card.id})\n`;
-          });
+          const result = await this.dataService!.getWhiteboard(params.whiteboardId, options);
+          
+          let text = `Whiteboard: ${result.whiteboard.name} (ID: ${result.whiteboard.id})\n`;
+          text += `Created: ${result.whiteboard.createdTime}\n`;
+          text += `Last edited: ${result.whiteboard.lastEditedTime}\n`;
+          
+          if (result.cards) {
+            text += `\nCards: ${result.cards.length}\n`;
+            result.cards.forEach(card => {
+              text += `- ${card.title || 'Untitled'} (ID: ${card.id})\n`;
+            });
+          }
+          
+          if (result.connections) {
+            text += `\nConnections: ${result.connections.length}\n`;
+          }
+
+          return {
+            content: [{
+              type: 'text',
+              text
+            }]
+          };
+        } catch (error) {
+          console.error('Error in getWhiteboard:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          return {
+            content: [{
+              type: 'text',
+              text: `Error: ${errorMessage}`
+            }]
+          };
         }
-        
-        if (result.connections) {
-          text += `\nConnections: ${result.connections.length}\n`;
-        }
-
-        return {
-          content: [{
-            type: 'text',
-            text
-          }]
-        };
       }
     };
 
@@ -462,81 +473,82 @@ export class HeptabaseMcpServer {
     this.tools.getCard = {
       inputSchema: getCardSchema,
       handler: async (params) => {
-        await this.ensureDataServiceInitialized();
+        try {
+          await this.ensureDataServiceInitialized();
 
-        const result = await this.dataService!.getCard(params.cardId);
-        const format = params.format || 'json';
-        
-        let text = '';
-        
-        if (format === 'markdown') {
-          text = `# ${result.card.title || 'Untitled'}\n\n`;
-          text += parseHeptabaseContentToMarkdown(result.card.content);
+          const result = await this.dataService!.getCard(params.cardId);
+          const format = params.format || 'json';
           
-          if (params.includeRelated) {
-            const instances = result.instances;
-            if (instances.length > 0) {
-              text += '\n## Appears on whiteboards:\n';
-              for (const instance of instances) {
-                const wb = await this.dataService!.getWhiteboard(instance.whiteboardId);
-                text += `- ${wb.whiteboard.name}\n`;
+          let text = '';
+          
+          if (format === 'markdown') {
+            text = `# ${result.card.title || 'Untitled'}\n\n`;
+            text += parseHeptabaseContentToMarkdown(result.card.content);
+            
+            if (params.includeRelated) {
+              const instances = result.instances;
+              if (instances.length > 0) {
+                text += '\n## Appears on whiteboards:\n';
+                for (const instance of instances) {
+                  const wb = await this.dataService!.getWhiteboard(instance.whiteboardId);
+                  text += `- ${wb.whiteboard.name}\n`;
+                }
+              }
+              
+              const connections = await this.dataService!.getConnections(params.cardId);
+              if (connections.length > 0) {
+                text += `\n## Related connections: ${connections.length}\n`;
               }
             }
             
-            const connections = await this.dataService!.getConnections(params.cardId);
-            if (connections.length > 0) {
-              text += `\n## Related connections: ${connections.length}\n`;
+            // Return as resource to bypass text size limits
+            return {
+              content: [{
+                type: 'resource',
+                resource: {
+                  uri: `heptabase://card/${result.card.id}`,
+                  mimeType: 'text/markdown',
+                  text
+                }
+              }]
+            };
+          } else if (format === 'html') {
+            text = `<h1>${result.card.title || 'Untitled'}</h1>\n`;
+            text += parseHeptabaseContentToHtml(result.card.content);
+            
+            if (params.includeRelated) {
+              const instances = result.instances;
+              if (instances.length > 0) {
+                text += '<h2>Appears on whiteboards:</h2><ul>';
+                for (const instance of instances) {
+                  const wb = await this.dataService!.getWhiteboard(instance.whiteboardId);
+                  text += `<li>${wb.whiteboard.name}</li>`;
+                }
+                text += '</ul>';
+              }
             }
-          }
-          
-          // Return as resource to bypass text size limits
-          return {
-            content: [{
-              type: 'resource',
-              resource: {
-                uri: `heptabase://card/${result.card.id}`,
-                mimeType: 'text/markdown',
-                text
-              }
-            }]
-          };
-        } else if (format === 'html') {
-          text = `<h1>${result.card.title || 'Untitled'}</h1>\n`;
-          text += parseHeptabaseContentToHtml(result.card.content);
-          
-          if (params.includeRelated) {
-            const instances = result.instances;
-            if (instances.length > 0) {
-              text += '<h2>Appears on whiteboards:</h2><ul>';
-              for (const instance of instances) {
-                const wb = await this.dataService!.getWhiteboard(instance.whiteboardId);
-                text += `<li>${wb.whiteboard.name}</li>`;
-              }
-              text += '</ul>';
-            }
-          }
-          
-          // Return as resource to bypass text size limits
-          return {
-            content: [{
-              type: 'resource',
-              resource: {
-                uri: `heptabase://card/${result.card.id}`,
-                mimeType: 'text/html',
-                text
-              }
-            }]
-          };
-        } else {
-          // Default JSON format - return full card data as resource
-          const cardData: any = {
-            id: result.card.id,
-            title: result.card.title,
-            content: JSON.parse(result.card.content),
-            createdTime: result.card.createdTime,
-            lastEditedTime: result.card.lastEditedTime,
-            instances: result.instances,
-            isTrashed: result.card.isTrashed
+            
+            // Return as resource to bypass text size limits
+            return {
+              content: [{
+                type: 'resource',
+                resource: {
+                  uri: `heptabase://card/${result.card.id}`,
+                  mimeType: 'text/html',
+                  text
+                }
+              }]
+            };
+          } else {
+            // Default JSON format - return full card data as resource
+            const cardData: any = {
+              id: result.card.id,
+              title: result.card.title,
+              content: JSON.parse(result.card.content),
+              createdTime: result.card.createdTime,
+              lastEditedTime: result.card.lastEditedTime,
+              instances: result.instances,
+              isTrashed: result.card.isTrashed
           };
           
           if (params.includeRelated) {
@@ -552,6 +564,16 @@ export class HeptabaseMcpServer {
                 mimeType: 'application/json',
                 text: JSON.stringify(cardData, null, 2)
               }
+            }]
+          };
+        }
+        } catch (error) {
+          console.error('Error in getCard:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          return {
+            content: [{
+              type: 'text',
+              text: `Error: ${errorMessage}`
             }]
           };
         }
@@ -571,10 +593,21 @@ export class HeptabaseMcpServer {
     this.tools.getCardContent = {
       inputSchema: getCardContentSchema,
       handler: async (params) => {
-        await this.ensureDataServiceInitialized();
-        
-        const handler = await import('./tools/getCardContent');
-        return handler.getCardContentHandler(params, this.dataService!);
+        try {
+          await this.ensureDataServiceInitialized();
+          
+          const handler = await import('./tools/getCardContent');
+          return handler.getCardContentHandler(params, this.dataService!);
+        } catch (error) {
+          console.error('Error in getCardContent:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          return {
+            content: [{
+              type: 'text',
+              text: `Error: ${errorMessage}`
+            }]
+          };
+        }
       }
     };
 
