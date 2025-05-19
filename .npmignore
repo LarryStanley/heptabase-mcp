@@ -1,0 +1,31 @@
+# Source files
+src/
+tests/
+
+# Config files
+.env
+.env.example
+.mcp-settings.json
+.mcp-settings.example.json
+jest.config.js
+jest.integration.config.js
+tsconfig.json
+
+# Build artifacts
+coverage/
+*.log
+
+# Documentation that's not needed in npm
+*.md
+!README.md
+claude-*.json
+
+# Git and IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Test and dev data
+data/
+temp*/

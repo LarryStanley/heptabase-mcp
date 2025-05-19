@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "heptabase": {
+      "command": "npx",
+      "args": ["@heptabase/mcp"],
+      "env": {
+        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup",
+        "HEPTABASE_AUTO_EXTRACT": "true",
+        "HEPTABASE_WATCH_DIRECTORY": "true"
+      }
+    }
+  }
+}

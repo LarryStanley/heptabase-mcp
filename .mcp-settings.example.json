@@ -1,0 +1,13 @@
+{
+  "backupPath": "/path/to/heptabase/backups",
+  "autoExtract": true,
+  "watchDirectory": true,
+  "extractionPath": "./data/extracted",
+  "keepExtracted": true,
+  "maxBackups": 10,
+  "cacheEnabled": true,
+  "cacheTTL": 3600,
+  "autoSelectLatest": true,
+  "dateFormat": "YYYY-MM-DD",
+  "timezone": "UTC"
+}
