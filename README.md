@@ -13,16 +13,47 @@ A Model Context Protocol (MCP) service for interacting with Heptabase backup dat
 
 ## Quick Start
 
-### Using with Claude Desktop (Recommended)
+### Installation and Setup
 
-The easiest way to use this MCP service is with Claude Desktop via `npx`:
+1. **Clone and install:**
+   ```bash
+   git clone <repository-url>
+   cd heptabase-mcp
+   npm install
+   ```
 
+2. **Configure using environment variables:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual paths
+   ```
+
+3. **Build the project:**
+   ```bash
+   npm run build
+   ```
+
+4. **Test locally (optional):**
+   ```bash
+   npm start
+   ```
+
+### Using with Claude Desktop
+
+Configure Claude Desktop to use your local build:
+
+**Edit your Claude Desktop config file:**
+- **macOS**: `~/Library/Application\ Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+**Add this configuration:**
 ```json
 {
   "mcpServers": {
     "heptabase": {
-      "command": "npx",
-      "args": ["@heptabase/mcp"],
+      "command": "/path/to/node",
+      "args": ["/path/to/your/heptabase-mcp/dist/index.js"],
       "env": {
         "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
         "HEPTABASE_AUTO_EXTRACT": "true",
@@ -33,34 +64,12 @@ The easiest way to use this MCP service is with Claude Desktop via `npx`:
 }
 ```
 
-**📋 Step-by-step setup:**
-1. Find your Heptabase backup directory (usually `Documents/Heptabase-auto-backup`)
-2. Copy the configuration above to your Claude Desktop config file
-3. Replace `/path/to/your/heptabase/backups` with your actual backup path
-4. Restart Claude Desktop
+**Important:** 
+- Replace `/path/to/node` with your Node.js path (find with `which node`)
+- Replace `/path/to/your/heptabase-mcp` with your actual project path
+- Set `HEPTABASE_BACKUP_PATH` to your Heptabase backup directory
 
 See [QUICK_START.md](./QUICK_START.md) for detailed setup instructions.
-
-### Local Development
-
-1. Clone and install:
-   ```bash
-   git clone <repository-url>
-   cd heptabase-mcp
-   npm install
-   ```
-
-2. Configure using environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your actual paths
-   ```
-
-3. Build and start:
-   ```bash
-   npm run build
-   npm start
-   ```
 
 ### Configuration
 
@@ -197,7 +206,7 @@ npm run type-check
 - [📚 Complete Specification](./SPECIFICATION.md) - Detailed API and architecture
 - [🚀 Quick Start Guide](./QUICK_START.md) - Get up and running fast
 - [⚙️ Configuration Guide](./CONFIG.md) - Safe configuration practices
-- [📖 Claude Desktop Setup](./CLAUDE_DESKTOP_NPX.md) - NPX integration guide
+- [📖 Claude Desktop Setup](./claude-desktop-setup.md) - Local development setup
 
 ## Privacy & Security
 
@@ -219,8 +228,9 @@ This project follows privacy-by-design principles:
 ### Common Issues
 
 - **"No backups found"** - Check your `HEPTABASE_BACKUP_PATH` points to the correct directory
-- **"Command not found: npx"** - Install Node.js from [nodejs.org](https://nodejs.org/)
+- **"Command not found"** - Ensure Node.js is installed and paths are correct
 - **Claude doesn't see tools** - Restart Claude Desktop completely after config changes
+- **Build errors** - Run `npm install` and `npm run build` before using
 
 ### Debug Mode
 

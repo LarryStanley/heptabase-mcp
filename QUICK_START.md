@@ -1,12 +1,43 @@
 # Quick Start Guide
 
-## 1. Find your Heptabase backup directory
+## 1. Clone and Setup the Project
 
-First, locate where Heptabase stores its backups:
+First, clone the repository and install dependencies:
+
+```bash
+git clone <repository-url>
+cd heptabase-mcp
+npm install
+```
+
+## 2. Find your Heptabase backup directory
+
+Locate where Heptabase stores its backups:
 - Usually in `Documents/Heptabase-auto-backup` or similar
-- Contains `.zip` files with dates like `heptabase-backup-2024-01-01.zip`
+- Contains `.zip` files with dates like `Heptabase-Data-Backup-2024-01-01T12-00-00-000Z.zip`
 
-## 2. Configure Claude Desktop
+## 3. Configure Environment Variables
+
+Create your personal configuration:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` with your actual paths:
+```env
+HEPTABASE_BACKUP_PATH=/path/to/your/heptabase/backups
+HEPTABASE_AUTO_EXTRACT=true
+HEPTABASE_WATCH_DIRECTORY=true
+```
+
+## 4. Build the Project
+
+```bash
+npm run build
+```
+
+## 5. Configure Claude Desktop
 
 Open Claude Desktop's configuration file:
 
@@ -14,29 +45,36 @@ Open Claude Desktop's configuration file:
 - **Windows**: `notepad %APPDATA%\Claude\claude_desktop_config.json`
 - **Linux**: `nano ~/.config/Claude/claude_desktop_config.json`
 
-## 3. Add the MCP server
+## 6. Add the MCP server
 
-Copy and paste this configuration, updating the backup path:
+Copy and paste this configuration, updating the paths:
 
 ```json
 {
   "mcpServers": {
     "heptabase": {
-      "command": "npx",
-      "args": ["@heptabase/mcp"],
+      "command": "/path/to/node",
+      "args": ["/path/to/your/heptabase-mcp/dist/index.js"],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups"
+        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
+        "HEPTABASE_AUTO_EXTRACT": "true",
+        "HEPTABASE_WATCH_DIRECTORY": "true"
       }
     }
   }
 }
 ```
 
-## 4. Restart Claude Desktop
+**Important:** 
+- Find your Node.js path with: `which node`
+- Use your actual project directory path
+- Set your actual Heptabase backup directory path
+
+## 7. Restart Claude Desktop
 
 Quit and restart Claude Desktop completely.
 
-## 5. Test it!
+## 8. Test it!
 
 Ask Claude:
 - "List my Heptabase backups"
@@ -45,42 +83,77 @@ Ask Claude:
 
 ## Common Issues
 
-### "Command not found: npx"
-Install Node.js from https://nodejs.org/
+### "Command not found" or "No such file"
+- Check that Node.js is installed: `node --version`
+- Verify the paths in your Claude Desktop config are correct
+- Make sure you built the project: `npm run build`
 
 ### "No backups found"
-Check that your `HEPTABASE_BACKUP_PATH` is correct and contains `.zip` files
+- Check that your `HEPTABASE_BACKUP_PATH` is correct and contains `.zip` files
+- Ensure the backup directory exists and is accessible
 
 ### Claude doesn't recognize the commands
-1. Make sure you restarted Claude Desktop
-2. Check logs at `~/Library/Logs/Claude/mcp.log` (macOS)
+1. Make sure you restarted Claude Desktop completely
+2. Check Claude Desktop logs at:
+   - **macOS**: `~/Library/Logs/Claude/mcp.log`
+   - **Windows**: `%LOCALAPPDATA%\Claude\logs\mcp.log`
 
 ## Example Configuration
 
-**For NPX usage (recommended):**
+**For macOS with nvm:**
 ```json
 {
   "mcpServers": {
     "heptabase": {
-      "command": "npx",
-      "args": ["@heptabase/mcp"],
+      "command": "/Users/yourusername/.nvm/versions/node/v20.18.0/bin/node",
+      "args": ["/Users/yourusername/Code/heptabase-mcp/dist/index.js"],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/Users/yourusername/Documents/Heptabase-auto-backup"
+        "HEPTABASE_BACKUP_PATH": "/Users/yourusername/Documents/Heptabase-auto-backup",
+        "HEPTABASE_AUTO_EXTRACT": "true",
+        "HEPTABASE_WATCH_DIRECTORY": "true"
       }
     }
   }
 }
 ```
 
-**For Local Development:**
-See `claude-config-example.json` for a complete configuration template.
+**For Windows:**
+```json
+{
+  "mcpServers": {
+    "heptabase": {
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "args": ["C:\\Users\\yourusername\\Code\\heptabase-mcp\\dist\\index.js"],
+      "env": {
+        "HEPTABASE_BACKUP_PATH": "C:\\Users\\yourusername\\Documents\\Heptabase-auto-backup",
+        "HEPTABASE_AUTO_EXTRACT": "true",
+        "HEPTABASE_WATCH_DIRECTORY": "true"
+      }
+    }
+  }
+}
+```
 
-## Personal Configuration
+## Personal Configuration Files
 
-For your personal setup, copy one of the example config files and modify the paths:
-- `claude-config-npx.json` → Your personal NPX config
-- `claude-config-example.json` → Your personal local development config
+For convenience, you can use the provided personal config templates:
 
-These personal config files are gitignored and won't be committed to the repository.
+1. Copy a template:
+   ```bash
+   cp claude-config-example.json claude-config-my-setup.json
+   ```
 
-That's it! No installation needed - `npx` handles everything automatically.
+2. Edit with your actual paths
+3. Copy the contents to your Claude Desktop config
+
+The personal config files (`*personal*.json`, `*my-setup*.json`) are gitignored and won't be committed.
+
+## Next Steps
+
+Once everything is working:
+- Explore the available tools with `debugInfo`
+- Try searching your whiteboards and cards
+- Export content to different formats
+- Set up file watching for automatic backup detection
+
+For more advanced configuration options, see [CONFIG.md](./CONFIG.md) and [ENV_SETUP.md](./ENV_SETUP.md).

@@ -59,29 +59,8 @@ export HEPTABASE_WATCH_DIRECTORY=true
 
 ### Method 3: Claude Desktop Configuration
 
-When configuring Claude Desktop, you can pass environment variables in the config:
+When configuring Claude Desktop for local development:
 
-**Option A: Using npx (recommended)**
-```json
-{
-  "mcpServers": {
-    "heptabase": {
-      "command": "npx",
-      "args": [
-        "@heptabase/mcp"
-      ],
-      "env": {
-        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
-        "HEPTABASE_AUTO_EXTRACT": "true",
-        "HEPTABASE_WATCH_DIRECTORY": "true",
-        "HEPTABASE_EXTRACTION_PATH": "/path/to/extraction/directory"
-      }
-    }
-  }
-}
-```
-
-**Option B: Using local development build**
 ```json
 {
   "mcpServers": {
@@ -100,6 +79,11 @@ When configuring Claude Desktop, you can pass environment variables in the confi
   }
 }
 ```
+
+**Important:** 
+- Replace `/path/to/node` with your actual Node.js path (find with `which node`)
+- Replace `/path/to/heptabase-mcp` with your project directory
+- Set the actual backup path for your system
 
 ## Configuration Precedence
 
@@ -169,6 +153,7 @@ C:\Users\yourusername\Documents\Heptabase-auto-backup
 You can test the server by running it directly and checking that it starts without errors:
 
 ```bash
+npm run build
 npm start
 ```
 
@@ -178,4 +163,51 @@ Use the `debugInfo` tool to verify your configuration is loaded correctly:
 
 ```typescript
 await mcpClient.callTool({ name: "debugInfo" });
+```
+
+## Example Claude Desktop Configurations
+
+**macOS with nvm:**
+```json
+{
+  "mcpServers": {
+    "heptabase": {
+      "command": "/Users/yourusername/.nvm/versions/node/v20.18.0/bin/node",
+      "args": ["/Users/yourusername/Code/heptabase-mcp/dist/index.js"],
+      "env": {
+        "HEPTABASE_BACKUP_PATH": "/Users/yourusername/Documents/Heptabase-auto-backup"
+      }
+    }
+  }
+}
+```
+
+**Windows:**
+```json
+{
+  "mcpServers": {
+    "heptabase": {
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "args": ["C:\\Users\\yourusername\\Code\\heptabase-mcp\\dist\\index.js"],
+      "env": {
+        "HEPTABASE_BACKUP_PATH": "C:\\Users\\yourusername\\Documents\\Heptabase-auto-backup"
+      }
+    }
+  }
+}
+```
+
+**Linux:**
+```json
+{
+  "mcpServers": {
+    "heptabase": {
+      "command": "/usr/bin/node",
+      "args": ["/home/yourusername/Code/heptabase-mcp/dist/index.js"],
+      "env": {
+        "HEPTABASE_BACKUP_PATH": "/home/yourusername/Documents/Heptabase-auto-backup"
+      }
+    }
+  }
+}
 ```
