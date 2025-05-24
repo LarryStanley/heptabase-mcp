@@ -33,26 +33,43 @@ The easiest way to use this MCP service is with Claude Desktop via `npx`:
 }
 ```
 
-See `CLAUDE_DESKTOP_NPX.md` for detailed setup instructions.
+**📋 Step-by-step setup:**
+1. Find your Heptabase backup directory (usually `Documents/Heptabase-auto-backup`)
+2. Copy the configuration above to your Claude Desktop config file
+3. Replace `/path/to/your/heptabase/backups` with your actual backup path
+4. Restart Claude Desktop
+
+See [QUICK_START.md](./QUICK_START.md) for detailed setup instructions.
 
 ### Local Development
 
-1. Install dependencies:
+1. Clone and install:
    ```bash
+   git clone <repository-url>
+   cd heptabase-mcp
    npm install
    ```
 
-2. Configure using environment variables. Create a `.env` file:
-   ```env
-   HEPTABASE_BACKUP_PATH=/path/to/your/heptabase/backups
-   HEPTABASE_AUTO_EXTRACT=true
-   HEPTABASE_WATCH_DIRECTORY=true
+2. Configure using environment variables:
+   ```bash
+   cp .env.example .env
+   # Edit .env with your actual paths
    ```
 
-3. Start the MCP server:
+3. Build and start:
    ```bash
+   npm run build
    npm start
    ```
+
+### Configuration
+
+This project uses a privacy-safe configuration system:
+
+- **Example files** (safe for git): `claude-config-example.json`, `.env.example`
+- **Personal files** (gitignored): `claude-config-*personal*.json`, `.env`
+
+See [CONFIG.md](./CONFIG.md) for detailed configuration instructions.
 
 ### Basic Usage
 
@@ -61,20 +78,39 @@ See `CLAUDE_DESKTOP_NPX.md` for detailed setup instructions.
 await mcpClient.callTool({
   name: "configureBackupPath",
   parameters: {
-    path: "/Users/stanley/Documents/Heptabase-auto-backup"
+    path: "/path/to/your/heptabase/backups"
   }
 });
 
 // List available backups
-const { backups } = await mcpClient.callTool({
+const backups = await mcpClient.callTool({
   name: "listBackups"
 });
 
 // Search for whiteboards
-const { whiteboards } = await mcpClient.callTool({
+const whiteboards = await mcpClient.callTool({
   name: "searchWhiteboards",
   parameters: {
     query: "Project Planning"
+  }
+});
+
+// Get full whiteboard content
+const whiteboard = await mcpClient.callTool({
+  name: "getWhiteboard",
+  parameters: {
+    whiteboardId: "your-whiteboard-id",
+    includeCards: true,
+    includeConnections: true
+  }
+});
+
+// Export to markdown
+const markdown = await mcpClient.callTool({
+  name: "exportWhiteboard",
+  parameters: {
+    whiteboardId: "your-whiteboard-id",
+    format: "markdown"
   }
 });
 ```
@@ -87,21 +123,25 @@ const { whiteboards } = await mcpClient.callTool({
 - `loadBackup` - Load a specific backup
 
 ### Search Operations
-- `searchWhiteboards` - Search whiteboards
-- `searchCards` - Search cards
+- `searchWhiteboards` - Search whiteboards by name or content
+- `searchCards` - Search cards across all whiteboards
 
 ### Data Retrieval
-- `getWhiteboard` - Get whiteboard data
-- `getCard` - Get card data
-- `getCardsByArea` - Get cards by position
+- `getWhiteboard` - Get complete whiteboard data
+- `getCard` - Get card content in multiple formats
+- `getCardContent` - Get card content as resource (bypasses size limits)
+- `getCardsByArea` - Find cards by position on whiteboard
 
 ### Export Functions
-- `exportWhiteboard` - Export to various formats
-- `summarizeWhiteboard` - Generate summaries
+- `exportWhiteboard` - Export to Markdown, JSON, HTML formats
+- `summarizeWhiteboard` - Generate AI-powered summaries
 
 ### Analysis Tools
-- `analyzeGraph` - Analyze relationships
-- `compareBackups` - Compare versions
+- `analyzeGraph` - Analyze card relationships and connections
+- `compareBackups` - Compare different backup versions
+
+### Debug Tools
+- `debugInfo` - Get system status and diagnostics
 
 ## Development
 
@@ -110,40 +150,108 @@ const { whiteboards } = await mcpClient.callTool({
 ```
 heptabase-mcp/
 ├── src/
-│   ├── index.ts              # MCP server
-│   ├── config/               # Configuration
-│   ├── services/             # Core services
-│   ├── tools/                # MCP tools
-│   └── types/                # TypeScript types
-├── tests/                    # Test files
-├── package.json
-└── tsconfig.json
+│   ├── index.ts              # Main entry point
+│   ├── server.ts             # MCP server implementation
+│   ├── services/             # Core business logic
+│   │   ├── BackupManager.ts  # Backup file management
+│   │   └── HeptabaseDataService.ts # Data querying
+│   ├── tools/                # MCP tool implementations
+│   ├── types/                # TypeScript definitions
+│   └── utils/                # Helper functions
+├── tests/                    # Test suites
+├── docs/                     # Documentation
+└── config files              # Configuration templates
 ```
 
 ### Testing
 
 ```bash
+# Run all tests
 npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run with coverage
+npm run test:coverage
+
+# Run integration tests
+npm run test:integration
 ```
 
 ### Building
 
 ```bash
+# Build for production
 npm run build
+
+# Development mode with auto-reload
+npm run dev
+
+# Type checking only
+npm run type-check
 ```
 
 ## Documentation
 
-For detailed documentation, see [SPECIFICATION.md](./SPECIFICATION.md).
+- [📚 Complete Specification](./SPECIFICATION.md) - Detailed API and architecture
+- [🚀 Quick Start Guide](./QUICK_START.md) - Get up and running fast
+- [⚙️ Configuration Guide](./CONFIG.md) - Safe configuration practices
+- [📖 Claude Desktop Setup](./CLAUDE_DESKTOP_NPX.md) - NPX integration guide
 
-## License
+## Privacy & Security
 
-MIT
+This project follows privacy-by-design principles:
+
+- ✅ Personal paths are never committed to git
+- ✅ Backup data stays local on your machine
+- ✅ Configuration templates use safe placeholders
+- ✅ Gitignore protects sensitive files
+
+## Requirements
+
+- **Node.js** 18+ 
+- **Heptabase** with backup exports enabled
+- **Claude Desktop** (for MCP integration)
+
+## Troubleshooting
+
+### Common Issues
+
+- **"No backups found"** - Check your `HEPTABASE_BACKUP_PATH` points to the correct directory
+- **"Command not found: npx"** - Install Node.js from [nodejs.org](https://nodejs.org/)
+- **Claude doesn't see tools** - Restart Claude Desktop completely after config changes
+
+### Debug Mode
+
+Use the `debugInfo` tool to check system status:
+```typescript
+await mcpClient.callTool({ name: "debugInfo" });
+```
 
 ## Contributing
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+See [SPECIFICATION.md](./SPECIFICATION.md) for architecture details.
+
+## License
+
+MIT License - see [LICENSE](./LICENSE) file for details.
 
 ## Support
 
-For issues and feature requests, please use the GitHub issue tracker.
+- 🐛 **Bug reports**: [GitHub Issues](https://github.com/yourusername/heptabase-mcp/issues)
+- 💬 **Questions**: [GitHub Discussions](https://github.com/yourusername/heptabase-mcp/discussions)
+- 📧 **Security issues**: Please report privately
+
+---
+
+Made with ❤️ for the Heptabase community
