@@ -35,7 +35,7 @@ Add the following to your `claude_desktop_config.json`:
         "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true",
-        "HEPTABASE_EXTRACTION_PATH": "/tmp/heptabase-extracted"
+        "HEPTABASE_EXTRACTION_PATH": "/path/to/extraction/directory"
       }
     }
   }
@@ -87,7 +87,7 @@ Show me cards in my "Ideas" whiteboard
       "command": "npx",
       "args": ["@heptabase/mcp"],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup",
+        "HEPTABASE_BACKUP_PATH": "/Users/yourusername/Documents/Heptabase-auto-backup",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true"
       }
@@ -104,7 +104,24 @@ Show me cards in my "Ideas" whiteboard
       "command": "npx",
       "args": ["@heptabase/mcp"],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "C:\\Users\\stanley\\Documents\\Heptabase-auto-backup",
+        "HEPTABASE_BACKUP_PATH": "C:\\Users\\yourusername\\Documents\\Heptabase-auto-backup",
+        "HEPTABASE_AUTO_EXTRACT": "true",
+        "HEPTABASE_WATCH_DIRECTORY": "true"
+      }
+    }
+  }
+}
+```
+
+### Linux Example
+```json
+{
+  "mcpServers": {
+    "heptabase": {
+      "command": "npx",
+      "args": ["@heptabase/mcp"],
+      "env": {
+        "HEPTABASE_BACKUP_PATH": "/home/yourusername/Documents/Heptabase-auto-backup",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true"
       }
@@ -166,3 +183,10 @@ Then use this configuration:
   }
 }
 ```
+
+## Privacy Note
+
+For privacy and security:
+- Never commit configuration files with your actual paths to version control
+- Use the provided template files and create your own personal configuration
+- Your backup data stays local on your machine and is never uploaded anywhere

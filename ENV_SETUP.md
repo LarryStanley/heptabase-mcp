@@ -1,6 +1,6 @@
 # Environment Variable Configuration
 
-The Heptabase MCP service now supports configuration through environment variables, which is more secure and flexible than using a JSON config file.
+The Heptabase MCP service supports configuration through environment variables, which is more secure and flexible than using a JSON config file.
 
 ## Configuration Options
 
@@ -8,7 +8,7 @@ All configuration options can be set via environment variables with the `HEPTABA
 
 | Environment Variable | Description | Default | Example |
 |---------------------|-------------|---------|---------|
-| `HEPTABASE_BACKUP_PATH` | Path to Heptabase backup directory | Required | `/Users/stanley/Documents/Heptabase-auto-backup` |
+| `HEPTABASE_BACKUP_PATH` | Path to Heptabase backup directory | Required | `/path/to/your/heptabase/backups` |
 | `HEPTABASE_AUTO_EXTRACT` | Automatically extract zip files | `true` | `true` |
 | `HEPTABASE_WATCH_DIRECTORY` | Watch backup directory for changes | `false` | `true` |
 | `HEPTABASE_EXTRACTION_PATH` | Path to extract zip files | `./data/extracted` | `/tmp/heptabase-extracted` |
@@ -31,7 +31,7 @@ All configuration options can be set via environment variables with the `HEPTABA
 
 2. Edit `.env` with your settings:
    ```env
-   HEPTABASE_BACKUP_PATH=/Users/stanley/Documents/Heptabase-auto-backup
+   HEPTABASE_BACKUP_PATH=/path/to/your/heptabase/backups
    HEPTABASE_AUTO_EXTRACT=true
    HEPTABASE_WATCH_DIRECTORY=true
    ```
@@ -43,7 +43,7 @@ All configuration options can be set via environment variables with the `HEPTABA
 Set environment variables in your shell:
 
 ```bash
-export HEPTABASE_BACKUP_PATH="/Users/stanley/Documents/Heptabase-auto-backup"
+export HEPTABASE_BACKUP_PATH="/path/to/your/heptabase/backups"
 export HEPTABASE_AUTO_EXTRACT=true
 export HEPTABASE_WATCH_DIRECTORY=true
 ```
@@ -52,7 +52,7 @@ Or add them to your shell profile (`~/.bash_profile`, `~/.zshrc`, etc.):
 
 ```bash
 # Heptabase MCP Configuration
-export HEPTABASE_BACKUP_PATH="/Users/stanley/Documents/Heptabase-auto-backup"
+export HEPTABASE_BACKUP_PATH="/path/to/your/heptabase/backups"
 export HEPTABASE_AUTO_EXTRACT=true
 export HEPTABASE_WATCH_DIRECTORY=true
 ```
@@ -71,10 +71,10 @@ When configuring Claude Desktop, you can pass environment variables in the confi
         "@heptabase/mcp"
       ],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup",
+        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true",
-        "HEPTABASE_EXTRACTION_PATH": "/Users/stanley/Code/side project/heptabase-mcp/data/extracted"
+        "HEPTABASE_EXTRACTION_PATH": "/path/to/extraction/directory"
       }
     }
   }
@@ -86,15 +86,15 @@ When configuring Claude Desktop, you can pass environment variables in the confi
 {
   "mcpServers": {
     "heptabase": {
-      "command": "/Users/stanley/.nvm/versions/node/v20.18.0/bin/node",
+      "command": "/path/to/node",
       "args": [
-        "/Users/stanley/Code/side project/heptabase-mcp/dist/index.js"
+        "/path/to/heptabase-mcp/dist/index.js"
       ],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup",
+        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true",
-        "HEPTABASE_EXTRACTION_PATH": "/Users/stanley/Code/side project/heptabase-mcp/data/extracted"
+        "HEPTABASE_EXTRACTION_PATH": "/path/to/extraction/directory"
       }
     }
   }
@@ -120,14 +120,22 @@ If you're migrating from the JSON config file:
 
 The server will still read `.mcp-settings.json` if it exists, but environment variables are now the recommended approach.
 
+## Privacy and Security
+
+**Important:** Never commit actual configuration files to version control:
+- Use `.env.example` as a template
+- Copy it to `.env` for your personal settings
+- The `.env` file is automatically gitignored
+- Personal configuration files are protected from accidental commits
+
 ## Example .env file
 
 ```env
 # Heptabase MCP Configuration
-HEPTABASE_BACKUP_PATH=/Users/stanley/Documents/Heptabase-auto-backup
+HEPTABASE_BACKUP_PATH=/path/to/your/heptabase/backups
 HEPTABASE_AUTO_EXTRACT=true
 HEPTABASE_WATCH_DIRECTORY=true
-HEPTABASE_EXTRACTION_PATH=/Users/stanley/Code/side project/heptabase-mcp/data/extracted
+HEPTABASE_EXTRACTION_PATH=/path/to/extraction/directory
 HEPTABASE_KEEP_EXTRACTED=true
 HEPTABASE_MAX_BACKUPS=10
 HEPTABASE_CACHE_ENABLED=true
@@ -135,6 +143,25 @@ HEPTABASE_CACHE_TTL=3600
 HEPTABASE_AUTO_SELECT_LATEST=true
 HEPTABASE_DATE_FORMAT=YYYY-MM-DD
 HEPTABASE_TIMEZONE=UTC
+```
+
+## Common Paths
+
+Here are some common backup directory locations:
+
+**macOS:**
+```
+/Users/yourusername/Documents/Heptabase-auto-backup
+```
+
+**Windows:**
+```
+C:\Users\yourusername\Documents\Heptabase-auto-backup
+```
+
+**Linux:**
+```
+/home/yourusername/Documents/Heptabase-auto-backup
 ```
 
 ## Verifying Configuration
@@ -146,3 +173,9 @@ npm start
 ```
 
 **Note**: The server no longer outputs startup messages to stdout to comply with the MCP protocol. It will silently start and be ready to handle MCP messages.
+
+Use the `debugInfo` tool to verify your configuration is loaded correctly:
+
+```typescript
+await mcpClient.callTool({ name: "debugInfo" });
+```
