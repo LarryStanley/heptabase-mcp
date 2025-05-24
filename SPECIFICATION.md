@@ -299,7 +299,7 @@ The service uses a `.mcp-settings.json` file for configuration:
 
 ```json
 {
-  "backupPath": "/Users/stanley/Documents/Heptabase-auto-backup",
+  "backupPath": "/path/to/your/heptabase/backups",
   "autoExtract": true,
   "watchDirectory": true,
   "extractionPath": "./data/extracted",
@@ -384,7 +384,7 @@ The service uses a `.mcp-settings.json` file for configuration:
 await mcpClient.callTool({
   name: "configureBackupPath",
   parameters: {
-    path: "/Users/stanley/Documents/Heptabase-auto-backup",
+    path: "/path/to/your/heptabase/backups",
     watchForChanges: true,
     autoExtract: true
   }

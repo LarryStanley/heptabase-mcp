@@ -3,7 +3,7 @@
 ## 1. Build the project
 
 ```bash
-cd /Users/stanley/Code/side\ project/heptabase-mcp
+cd /path/to/your/heptabase-mcp
 npm install
 npm run build
 ```
@@ -42,7 +42,7 @@ You have two options for configuring the server:
         "@heptabase/mcp"
       ],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup",
+        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true",
         "HEPTABASE_EXTRACTION_PATH": "/tmp/heptabase-extracted"
@@ -58,15 +58,15 @@ You have two options for configuring the server:
 {
   "mcpServers": {
     "heptabase": {
-      "command": "/Users/stanley/.nvm/versions/node/v20.18.0/bin/node",
+      "command": "/path/to/node",
       "args": [
-        "/Users/stanley/Code/side project/heptabase-mcp/dist/index.js"
+        "/path/to/your/heptabase-mcp/dist/index.js"
       ],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup",
+        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true",
-        "HEPTABASE_EXTRACTION_PATH": "/Users/stanley/Code/side project/heptabase-mcp/data/extracted"
+        "HEPTABASE_EXTRACTION_PATH": "/path/to/extraction/directory"
       }
     }
   }
@@ -74,9 +74,30 @@ You have two options for configuring the server:
 ```
 
 **Important:** Adjust the paths based on your system:
-- Replace `/Users/stanley/.nvm/versions/node/v20.18.0/bin/node` with your Node.js path (find it with `which node`)
+- Replace `/path/to/node` with your Node.js path (find it with `which node`)
 - Replace the project path with your actual path
 - Set `HEPTABASE_BACKUP_PATH` to your Heptabase backup directory
+
+### Example for macOS with nvm:
+
+```json
+{
+  "mcpServers": {
+    "heptabase": {
+      "command": "/Users/yourusername/.nvm/versions/node/v20.18.0/bin/node",
+      "args": [
+        "/Users/yourusername/Code/heptabase-mcp/dist/index.js"
+      ],
+      "env": {
+        "HEPTABASE_BACKUP_PATH": "/Users/yourusername/Documents/Heptabase-auto-backup",
+        "HEPTABASE_AUTO_EXTRACT": "true",
+        "HEPTABASE_WATCH_DIRECTORY": "true",
+        "HEPTABASE_EXTRACTION_PATH": "/Users/yourusername/Code/heptabase-mcp/data/extracted"
+      }
+    }
+  }
+}
+```
 
 ## 4. Environment Variables
 
@@ -119,7 +140,7 @@ If the MCP server doesn't connect:
 
 2. Test the server manually:
    ```bash
-   cd /Users/stanley/Code/side\ project/heptabase-mcp
+   cd /path/to/your/heptabase-mcp
    npm start
    ```
    **Note**: The server won't output any messages to stdout (to comply with MCP protocol). If it runs without errors, it's working correctly.
@@ -142,3 +163,10 @@ If the MCP server doesn't connect:
 2. **Server not found**: Verify the paths in your config match your system. On macOS with nvm, the path is usually `/Users/<username>/.nvm/versions/node/<version>/bin/node`
 
 3. **No backups found**: Make sure `HEPTABASE_BACKUP_PATH` points to the directory containing your Heptabase backup files (usually `.heptabase-backup-journal-*` files)
+
+## Privacy Note
+
+For privacy and security:
+- Use the provided configuration templates and create your own personal versions
+- Never commit actual paths or sensitive information to version control
+- Consider using environment variables or separate config files for personal settings
