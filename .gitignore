@@ -9,3 +9,7 @@ data/
 tests/temp*
 *.zip
 .claude
+
+# Personal configuration files (with real paths)
+claude-config-*personal*.json
+*.backup

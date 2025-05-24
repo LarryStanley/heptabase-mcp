@@ -55,8 +55,9 @@ Check that your `HEPTABASE_BACKUP_PATH` is correct and contains `.zip` files
 1. Make sure you restarted Claude Desktop
 2. Check logs at `~/Library/Logs/Claude/mcp.log` (macOS)
 
-## Example for macOS
+## Example Configuration
 
+**For NPX usage (recommended):**
 ```json
 {
   "mcpServers": {
@@ -64,27 +65,22 @@ Check that your `HEPTABASE_BACKUP_PATH` is correct and contains `.zip` files
       "command": "npx",
       "args": ["@heptabase/mcp"],
       "env": {
-        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup"
+        "HEPTABASE_BACKUP_PATH": "/Users/yourusername/Documents/Heptabase-auto-backup"
       }
     }
   }
 }
 ```
 
-## Example for Windows
+**For Local Development:**
+See `claude-config-example.json` for a complete configuration template.
 
-```json
-{
-  "mcpServers": {
-    "heptabase": {
-      "command": "npx",
-      "args": ["@heptabase/mcp"],
-      "env": {
-        "HEPTABASE_BACKUP_PATH": "C:\\Users\\stanley\\Documents\\Heptabase-auto-backup"
-      }
-    }
-  }
-}
-```
+## Personal Configuration
+
+For your personal setup, copy one of the example config files and modify the paths:
+- `claude-config-npx.json` → Your personal NPX config
+- `claude-config-example.json` → Your personal local development config
+
+These personal config files are gitignored and won't be committed to the repository.
 
 That's it! No installation needed - `npx` handles everything automatically.

@@ -1,16 +1,16 @@
 {
   "mcpServers": {
     "heptabase": {
-      "command": "/Users/stanley/.nvm/versions/node/v20.18.0/bin/node",
+      "command": "/path/to/node",
       "args": [
-        "/Users/stanley/Code/side project/heptabase-mcp/dist/index.js"
+        "/path/to/heptabase-mcp/dist/index.js"
       ],
       "env": {
         "NODE_ENV": "production",
-        "HEPTABASE_BACKUP_PATH": "/Users/stanley/Documents/Heptabase-auto-backup",
+        "HEPTABASE_BACKUP_PATH": "/path/to/your/heptabase/backups",
         "HEPTABASE_AUTO_EXTRACT": "true",
         "HEPTABASE_WATCH_DIRECTORY": "true",
-        "HEPTABASE_EXTRACTION_PATH": "/Users/stanley/Code/side project/heptabase-mcp/data/extracted",
+        "HEPTABASE_EXTRACTION_PATH": "/path/to/extraction/directory",
         "HEPTABASE_KEEP_EXTRACTED": "true",
         "HEPTABASE_CACHE_ENABLED": "true",
         "HEPTABASE_CACHE_TTL": "3600"
